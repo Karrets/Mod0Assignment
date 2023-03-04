@@ -2,17 +2,15 @@ namespace Assignment;
 
 public class TicketManager {
     private string _file;
-    private List<Ticket> _ticketList;
 
     public TicketManager(string file) {
         _file = file;
-        _ticketList = new List<Ticket>();
     }
 
-    public List<Ticket> Read() {
+    public void Read() {
         if(!File.Exists(_file)) {
             Console.WriteLine($"Error: No ticket data file exists. ({_file})");
-            return new();
+            return;
         }
 
         StreamReader sr = new StreamReader(_file);
@@ -39,8 +37,6 @@ public class TicketManager {
         Console.WriteLine();
 
         sr.Close();
-
-        return _ticketList;
     }
 
     public void Write(List<Ticket> tickets) {
