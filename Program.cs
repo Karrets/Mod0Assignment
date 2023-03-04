@@ -2,9 +2,9 @@
 
 namespace Assignment;
 
-class Program {
+internal static class Program {
     static void Main() {
-        string file = "ticketData.csv";
+        TicketManager tMan = new TicketManager("ticketData.csv");
         bool run = true;
 
         do {
@@ -20,48 +20,13 @@ class Program {
                 case '1':
                 case 'R':
                 case 'r':
-                    if(!File.Exists(file)) {
-                        Console.WriteLine($"Error: No ticket data file exists. ({file})");
-                        break;
-                    }
-
-                    StreamReader sr = new StreamReader(file);
-
-                    while(!sr.EndOfStream) {
-                        string[] line = (sr.ReadLine() ?? "").Split(',');
-
-                        for(int i = 0; i < line.Length; i++) {
-                            if(i == line.Length - 1) {
-                                String[] watchList = line[i].Split('|');
-
-                                Console.WriteLine(watchList[0].PadLeft(12) + ',');
-                                for(int j = 1; j < watchList.Length; j++) {
-                                    Console.WriteLine(watchList[j].PadLeft(90) + ',');
-                                }
-                                
-                                Console.WriteLine("-".PadLeft(91, '-'));
-                                
-                            } else {
-                                Console.Write(line[i].PadLeft(12) + ',');
-                            }
-                        }
-                    }
-                    
-                    Console.WriteLine();
-
-                    sr.Close();
+                    tMan.Read();
                     break;
                 case '2':
                 case 'W':
                 case 'w':
-                    bool addCsvTemplate = !File.Exists(file);
-                    FileStream fs = new FileStream(file, FileMode.Append);
-                    StreamWriter sw = new StreamWriter(fs);
-
-                    if(addCsvTemplate) sw.WriteLine("TicketID,Summary,Status,Priority,Submitter,Assigned,Watching");
-
+                    List<Ticket> toAdd = new();
                     bool addingTickets = true;
-                    List<Ticket> ticketList = new List<Ticket>();
 
                     while(addingTickets) {
                         Console.WriteLine("Enter a ticket ID (Numeric Only)");
@@ -93,19 +58,14 @@ class Program {
                             if((Console.ReadLine() ?? "").ToUpper()[0] == 'N') addingWatchers = false;
                         }
 
-                        ticketList.Add(new Ticket(ticketId, summary, status, priority, submitter, assigned,
+                        toAdd.Add(new Ticket(ticketId, summary, status, priority, submitter, assigned,
                             watchList.ToArray()));
 
                         Console.WriteLine("Add another ticket? (y/n)");
                         if((Console.ReadLine() ?? "").ToUpper()[0] == 'N') addingTickets = false;
                     }
 
-                    foreach(var ticket in ticketList) {
-                        sw.WriteLine(ticket.ToString());
-                    }
-
-                    sw.Close();
-                    fs.Close();
+                    tMan.Write(toAdd);
                     break;
                 case '3':
                 case 'E':
