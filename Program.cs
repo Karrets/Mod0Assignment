@@ -1,10 +1,13 @@
-﻿using System.Collections;
+﻿using System.Text;
+using Assignment.Tickets.Classifier;
 
 namespace Assignment;
 
+using Tickets;
+
 internal static class Program {
     static void Main() {
-        TicketManager tMan = new TicketManager("ticketData.csv");
+        TicketManager tMan = new("bugs.csv", "enhancements.csv", "tasks.csv");
         bool run = true;
 
         do {
@@ -20,7 +23,7 @@ internal static class Program {
                 case '1':
                 case 'R':
                 case 'r':
-                    tMan.Read();
+                    tMan.ReadAll();
                     break;
                 case '2':
                 case 'W':
@@ -29,37 +32,75 @@ internal static class Program {
                     bool addingTickets = true;
 
                     while(addingTickets) {
-                        Console.WriteLine("Enter a ticket ID (Numeric Only)");
-                        string ticketId = Console.ReadLine() ?? "";
+                        TicketType ticketType;
+                        do {
+                            Console.WriteLine("Enter a ticket type:");
+                        } while(!Enum.TryParse(Console.ReadLine(), true, out ticketType));
 
-                        Console.WriteLine("Enter a ticket summary.");
-                        string summary = Console.ReadLine() ?? "";
+                        List<string> ticketData = new();
+                        Console.WriteLine("Enter a ticket ID:");
+                        ticketData.Add(Console.ReadLine() ?? "");
 
-                        Console.WriteLine("Enter a ticket status.");
-                        string status = Console.ReadLine() ?? "";
+                        Console.WriteLine("Enter a ticket summary:");
+                        ticketData.Add(Console.ReadLine() ?? "");
 
-                        Console.WriteLine("Enter a ticket priority.");
-                        string priority = Console.ReadLine() ?? "";
+                        Console.WriteLine("Enter a ticket status:");
+                        ticketData.Add(Console.ReadLine() ?? "");
 
-                        Console.WriteLine("Enter the person who submitted this ticket.");
-                        string submitter = Console.ReadLine() ?? "";
+                        Console.WriteLine("Enter a ticket priority:");
+                        ticketData.Add(Console.ReadLine() ?? "");
 
-                        Console.WriteLine("Enter the person assigned to this ticket.");
-                        string assigned = Console.ReadLine() ?? "";
+                        Console.WriteLine("Enter the person who submitted this ticket:");
+                        ticketData.Add(Console.ReadLine() ?? "");
+
+                        Console.WriteLine("Enter the person assigned to this ticket:");
+                        ticketData.Add(Console.ReadLine() ?? "");
 
                         bool addingWatchers = true;
-                        List<string> watchList = new List<string>();
+                        var watchList = new List<string>();
 
                         while(addingWatchers) {
-                            Console.WriteLine("Enter a person watching this ticket.");
+                            Console.WriteLine("Enter a person watching this ticket:");
                             watchList.Add(Console.ReadLine() ?? "");
 
                             Console.WriteLine("Add another watcher? (y/n)");
                             if((Console.ReadLine() ?? "").ToUpper()[0] == 'N') addingWatchers = false;
                         }
 
-                        toAdd.Add(new Ticket(ticketId, summary, status, priority, submitter, assigned,
-                            watchList.ToArray()));
+                        ticketData.Add(string.Join('|', watchList));
+
+                        //Begin ticket subtype specifics.
+                        switch(ticketType) {
+                            case TicketType.Bug:
+                                Severity severity;
+                                do {
+                                    Console.WriteLine("Enter a bug severity: ");
+                                } while(!Enum.TryParse(Console.ReadLine(), true, out severity));
+
+                                ticketData.Add(severity.ToString());
+
+                                toAdd.Add(new Bug(string.Join(',', ticketData)));
+
+                                break;
+                            case TicketType.Enhancement:
+                                Console.WriteLine("Enter the software this feature request is for:");
+                                ticketData.Add(Console.ReadLine() ?? "");
+                                Console.WriteLine("Enter an estimated cost for the feature (Numeric Only):");
+                                ticketData.Add(Console.ReadLine() ?? "");
+                                Console.WriteLine("Enter the reason:");
+                                ticketData.Add(Console.ReadLine() ?? "");
+                                Console.WriteLine("Enter a time estimate (mm/dd/yyyy):");
+                                ticketData.Add(Console.ReadLine() ?? "");
+                                break;
+                            case TicketType.Task:
+                                Console.WriteLine("Enter the name of the task: ");
+                                ticketData.Add(Console.ReadLine() ?? "");
+                                Console.WriteLine("Enter the due-date of the task: ");
+                                ticketData.Add(Console.ReadLine() ?? "");
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException("");
+                        }
 
                         Console.WriteLine("Add another ticket? (y/n)");
                         if((Console.ReadLine() ?? "").ToUpper()[0] == 'N') addingTickets = false;
