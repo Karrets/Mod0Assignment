@@ -12,9 +12,10 @@ internal static class Program {
 
         do {
             Console.WriteLine("*- Welcome Ticket Admin, Please Select A Task -*\n" +
-                              "1. (R)ead from the ticket list.\n" +
-                              "2. (W)rite to the ticket list.\n" +
-                              "3. (E)xit the program");
+                              "1. (R)ead all tickets from the ticket list.\n" +
+                              "2. (S)earch for tickets in the ticket list.\n" +
+                              "3. (W)rite to the ticket list.\n" +
+                              "4. (E)xit the program");
 
             char userInput =
                 (Console.ReadLine() ?? " ")[0]; //Substitute null values for space and get the first character.
@@ -23,9 +24,16 @@ internal static class Program {
                 case '1':
                 case 'R':
                 case 'r':
-                    tMan.ReadAll();
+                    foreach(var ticket in tMan.ReadAll()) {
+                        Console.WriteLine(ticket);
+                    }
                     break;
                 case '2':
+                case 'S':
+                case 's':
+                    throw new NotImplementedException();
+                    break;
+                case '3':
                 case 'W':
                 case 'w':
                     List<Ticket> toAdd = new();
@@ -108,7 +116,7 @@ internal static class Program {
 
                     tMan.Write(toAdd);
                     break;
-                case '3':
+                case '4':
                 case 'E':
                 case 'e':
                     run = false;

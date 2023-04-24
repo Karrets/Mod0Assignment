@@ -36,5 +36,10 @@ public abstract class Ticket {
         Watching = split[6].Split('|');
     }
 
+    public override string ToString() {
+        return HumanReadable();
+    }
+
     public abstract string Serialize();
+    protected abstract string HumanReadable();
 }

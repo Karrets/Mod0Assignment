@@ -39,4 +39,15 @@ public class Bug : Ticket {
 
         return string.Join(',', result);
     }
+
+    protected override string HumanReadable() {
+        return $"ID:        {TicketId}\n" +
+               $"Summary:   {Summary}\n" +
+               $"Status:    {Status}\n" +
+               $"Priority:  {Priority}\n" +
+               $"Submitter: {Submitter}\n" +
+               $"Assigned:  {Assigned}\n" +
+               $"Watching:  {string.Join(", ", Watching)}\n" +
+               $"Severity:  {Severity}";
+    }
 }

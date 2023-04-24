@@ -23,6 +23,33 @@ public class Task : Ticket {
     }
 
     public override string Serialize() {
-        throw new NotImplementedException();
+        var result = new List<string> {
+            TicketId,
+            Summary,
+            Status,
+            Priority,
+            Submitter,
+            Assigned,
+            string.Join('|', Watching),
+            ProjectName,
+            DueDate
+        };
+
+        //Join Method takes a separator, and an array, and returns a string seperated list by your delimiter.
+
+        return string.Join(',', result);
+    }
+
+    protected override string HumanReadable() {
+        
+        return $"ID:        {TicketId}\n" +
+               $"Summary:   {Summary}\n" +
+               $"Status:    {Status}\n" +
+               $"Priority:  {Priority}\n" +
+               $"Submitter: {Submitter}\n" +
+               $"Assigned:  {Assigned}\n" +
+               $"Watching:  {string.Join(", ", Watching)}\n" +
+               $"Severity:  {ProjectName}\n" +
+               $"Due Date:  {DueDate}";
     }
 }

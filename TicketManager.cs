@@ -15,13 +15,19 @@ public class TicketManager {
         _taskFile = taskFile;
     }
 
-    public void ReadAll() {
+    public List<Ticket> ReadAll() {
+        List<Ticket> tickets = new();
+        
         foreach(var type in Enum.GetValues<TicketType>()) {
-            Read(type);
+            tickets.AddRange(ReadType(type));
         }
+
+        return tickets;
     }
     
-    public void Read(TicketType type) {
+    public List<Ticket> ReadType(TicketType type) {
+        List<Ticket> tickets = new();
+        
         string file = type switch {
             TicketType.Bug => _bugFile,
             TicketType.Enhancement => _enhancementFile,
@@ -31,33 +37,22 @@ public class TicketManager {
 
         if(!File.Exists(file)) {
             Console.WriteLine($"Warn: No ticket data file exists. ({file})");
-            return;
+            return new();
         }
 
         StreamReader sr = new(file);
 
+        sr.ReadLine(); //Read csv header to skip to data!!!
+        
         while(!sr.EndOfStream) {
-            string[] line = (sr.ReadLine() ?? "").Split(',');
-
-            for(int i = 0; i < line.Length; i++) {
-                if(i == line.Length - 1) {
-                    string[] watchList = line[i].Split('|');
-
-                    Console.WriteLine(watchList[0].PadLeft(12) + ',');
-                    for(int j = 1; j < watchList.Length; j++) {
-                        Console.WriteLine(watchList[j].PadLeft(90) + ',');
-                    }
-
-                    Console.WriteLine("-".PadLeft(104, '-'));
-                } else {
-                    Console.Write(line[i].PadLeft(12) + ',');
-                }
-            }
+            string? ticketSerial = sr.ReadLine();
+            if(ticketSerial is not null)
+                tickets.Add(type.Of(ticketSerial));
         }
 
-        Console.WriteLine();
-
         sr.Close();
+
+        return tickets;
     }
 
     public void Write(List<Ticket> tickets) {
